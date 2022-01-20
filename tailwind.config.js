@@ -14,7 +14,7 @@ module.exports = {
         '120': '35rem',
         '130': '40rem',
         '140': '45rem',
-        '200': '60rem',
+        '200': '55rem',
 		  },
       fontSize: {
         'input': '18px',
