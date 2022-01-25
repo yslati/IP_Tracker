@@ -3,39 +3,53 @@ import { ChevronRightIcon, RefreshIcon } from '@heroicons/react/solid'
 import Info from './Info';
 import axios from 'axios';
 
+const checkValidIP = (str:string) => {
+
+	const regexExp = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/gi;
+	return regexExp.test(str);
+}
+
+const checkDomain = (str:string) => {
+	
+	const regexExp = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
+	return regexExp.test(str)
+}
+
+
+
 const Header = () => {
 
 	const [input, setInput] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [data, setData] = useState()
 	const [error, setError] = useState()
-	
+
+	const sendReq = (data:string) => {
+		axios.get(`https://geo.ipify.org/api/v2/country?apiKey=at_UAJJkLpdCragMY1Z0CugmRpyQlQVI&${data}`)
+		.then(res => {
+			setData(res.data)
+		})
+		.catch(error => {
+			console.log(`error fetching data: ${error}`);
+			setError(error)
+		})
+		.finally(() => {
+			setLoading(false)
+		})
+	}
+
+
 	const handleSubmit = () => {
 		if (input.length > 6 && input.length < 30) {
-			console.log(input);
 			setLoading(true)
-			// fetch(`https://geo.ipify.org/api/v2/country?apiKey=at_UAJJkLpdCragMY1Z0CugmRpyQlQVI&ipAddress=${input}`)
-			// .then(res => {
-			// 	if (res.ok)
-			// 		return res.json()
-			// 	throw res
-			// })
-			// .then(data => {
-			// 	setData(data)
-			// })
-			// .catch(error => {
-			// 	console.log(`error fetching data: ${error}`);
-			// 	setError(error);
-			// })
-			// .finally(() => {
-			// 	setLoading(false)
-			// 	console.log(data);
-			// })
-			
-			axios.get(`https://geo.ipify.org/api/v2/country?apiKey=at_UAJJkLpdCragMY1Z0CugmRpyQlQVI&ipAddress=${input}`)
-			.then(res => {
-				setData(res.data)
-			})
+			if (checkValidIP(input))
+				sendReq(`ipAddress=${input}`)
+			else if (checkDomain(input))
+					sendReq(`domain=${input}`)
+			else {
+				alert('invalid input ip/domain')
+				setLoading(false)
+			}
 		}
 	}
 
@@ -51,14 +65,14 @@ const Header = () => {
 					className="text-input md:w-96 px-5 py-1 text-veryDarkGray rounded-full focus:outline-none appearance-none"
 					placeholder="Search for any IP address or domain" 
 				/>
-				<button onClick={handleSubmit} type="submit" className="flex ml-auto items-center bg-veryDarkGray hover:bg-gray-700 justify-center w-12 h-12 rounded-r-xl">
+				<button disabled={loading} onClick={handleSubmit} type="submit" className="flex ml-auto items-center bg-veryDarkGray hover:bg-gray-700 justify-center w-12 h-12 rounded-r-xl">
 					{!loading ? 
 						<ChevronRightIcon className="w-7 h-7 text-white" />
 					:	<RefreshIcon className='w-5 h-5 text-white animate-spin' />
 					}
 				</button>
 			</div>
-			<Info />
+			<Info data={data} />
 		</div>
 	</div>
   )
