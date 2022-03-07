@@ -25,6 +25,7 @@ const Header = () => {
 	const [error, setError] = useState()
 
 	const sendReq = (data:string) => {
+		
 		axios.get(`https://geo.ipify.org/api/v2/country?apiKey=at_UAJJkLpdCragMY1Z0CugmRpyQlQVI&${data}`)
 		.then(res => {
 			setData(res.data)
@@ -35,11 +36,14 @@ const Header = () => {
 		})
 		.finally(() => {
 			setLoading(false)
+			console.log(error);
+			
 		})
 	}
 
 
 	const handleSubmit = () => {
+		console.log("handle");
 		if (input.length > 6 && input.length < 30) {
 			setLoading(true)
 			if (checkValidIP(input))
@@ -50,8 +54,25 @@ const Header = () => {
 				alert('invalid input ip/domain')
 				setLoading(false)
 			}
+			setInput('')
 		}
 	}
+
+	// const handleEnter = (event) => {
+	// 	if (event.key === 'Enter') {
+	// 		console.log('do validate')
+	// 	}
+	// }
+
+	document.getElementById("ip/domain")
+	?.addEventListener("keydown", (event) => {
+		console.log('press');
+		if (event.key === "Enter") {
+			setTimeout(handleSubmit, 5000)
+			console.log(input);
+			// handleSubmit()
+		}
+	});
 
   return (
 	<div className="w-screen h-72 flex flex-col items-center">
@@ -65,7 +86,7 @@ const Header = () => {
 					className="text-input md:w-96 px-5 py-1 text-veryDarkGray rounded-full focus:outline-none appearance-none"
 					placeholder="Search for any IP address or domain" 
 				/>
-				<button disabled={loading} onClick={handleSubmit} type="submit" className="flex ml-auto items-center bg-veryDarkGray hover:bg-gray-700 justify-center w-12 h-12 rounded-r-xl">
+				<button disabled={loading} onClick={handleSubmit} id="submitkey" type="submit" className="flex ml-auto items-center bg-veryDarkGray hover:bg-gray-700 justify-center w-12 h-12 rounded-r-xl">
 					{!loading ? 
 						<ChevronRightIcon className="w-7 h-7 text-white" />
 					:	<RefreshIcon className='w-5 h-5 text-white animate-spin' />
